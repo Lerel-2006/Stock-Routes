@@ -233,6 +233,16 @@ function criarVisitados(){
     return visitados;
 }
 
+function criarPredecessores(){
+    const predecessores = {};
+
+    nos.forEach(no => {
+        predecessores[no.id] = null;
+    });
+
+    return predecessores;
+}
+
 /*
 console.log(
     "Nós visitados: ",
@@ -256,7 +266,7 @@ function encontrarNoMenorDistancia(distancias, visitados){
     return noMaisProximo;
 }
 
-function atualizarDistancias(idNo, distancias, visitados){
+function atualizarDistancias(idNo, distancias, visitados, predecessores){
     
     const vizinhos = encontrarVizinhosComPeso(idNo);
 
@@ -269,6 +279,8 @@ function atualizarDistancias(idNo, distancias, visitados){
 
         if(novaDistancia < distancias[vizinho.id]){
             distancias[vizinho.id] = novaDistancia;
+
+            predecessores[vizinho.id] = idNo;//vou guardando de onde cada nó veio, exemplo o nó 4 veio do 3 que veio do 2, isso para reconstruir o caminho de trás para frente e depois inverter
         }
     });
 }
@@ -286,6 +298,7 @@ console.log("Distâncias após analisar o nó 0: ", distanciasTeste2);
 function dijkstra(idOrigem){
     const distancias = criarDistancias(idOrigem);
     const visitados = criarVisitados();
+    const predecessores = criarPredecessores();
 
     //toda vez que atualizar o nó ele será marcado como visitado
     while(true){
@@ -309,24 +322,29 @@ function dijkstra(idOrigem){
         atualizarDistancias(
             noAtual,
             distancias,
-            visitados
+            visitados,
+            predecessores
         );
 
     }
 
     console.log("Distâncias: ", distancias);
-    console.log("Visitados: ", visitados);
+    //console.log("Visitados: ", visitados);
+    console.log("Predecessores: ", predecessores);
 
-    return distancias;
+    return {
+        distancias: distancias,
+        predecessores: predecessores
+    };
 }
 
 const resultadoDijkstra = dijkstra(0);
 const distancias1 = dijkstra(1);
 const distancias2 = dijkstra(2);
 
-console.log("Entrada → Entrada:", resultadoDijkstra[0]);
-console.log("Entrada → Nó 1:", resultadoDijkstra[1]);
-console.log("Entrada → Nó 2:", resultadoDijkstra[2]);
+console.log("Entrada → Entrada:", resultadoDijkstra.distancias[0]);
+console.log("Entrada → Nó 1:", resultadoDijkstra.distancias[1]);
+console.log("Entrada → Nó 2:", resultadoDijkstra.distancias[2]);
 
 //essa matriz contém todas as distâncias de ponto a ponto do estoque
 //depois passo para o tsp calcular qual rota é a menor
@@ -337,9 +355,10 @@ function criarMatrizDijkstra(){
     const matriz = [];
 
     for(let i = 0; i < nos.length; i++){
-        const distancias = dijkstra(i);
 
-        matriz.push(Object.values(distancias));
+        const resultado = dijkstra(i);
+
+        matriz.push(Object.values(resultado.distancias));
     }
     
     return matriz;
@@ -563,14 +582,35 @@ const pontosDoPedido = criarPontosDoPedido(pedido);
 console.log("Pontos do pedido:", pontosDoPedido);
  */
 
+//é uma laço aninhado padrão que serve para a criação de uma matriz
 function criarMatrizDoPedido(pontosDoPedido, matrizDijkstra){
     const matriz = [];
 
     for(let i =  0; i < pontosDoPedido.length; i++){
         
+        const linha = [];
+
+        for(let j = 0; j <  pontosDoPedido.length; j++){
+
+            const noOrigem = pontosDoPedido[i].noId;
+            const noDestino = pontosDoPedido[j].noId;
+
+            const distancia = matrizDijkstra[noOrigem][noDestino];
+
+            linha.push(distancia);
+
+        }
+        
+        matriz.push(linha);
+
     }
+
+    return matriz;
 }
 
+
+
+ 
 const item = pedido[0];
 
 const produto = encontrarProduto(item.produtoId);
@@ -708,6 +748,42 @@ function gerarRotas(pontos){
 
     return rotas;
 }
+
+//a diferença dessa função para a de cima é que essa estou trabalhando apenas com os pontos do pedido relacionados aquela matriz de Dijkstra
+function gerarRotasDoPedido(pontosDoPedido){
+
+    const rotas = [];
+
+    const inicio = 0;
+
+    for(let i = 1; i < pontosDoPedido.length; i++){
+        for(let j = 1; j < pontosDoPedido.length; j++){
+            if(i !== j){
+                rotas.push([
+                    inicio,
+                    i,
+                    j
+                ]);
+            }
+        }
+    }
+
+    return rotas;
+}
+
+const pontosDoPedido = criarPontosDoPedido(pedido);
+
+const matrizDoPedido = criarMatrizDoPedido(pontosDoPedido, matrizDijkstra);
+
+console.log("Matriz do pedido: ", matrizDoPedido);//aqui é somente a matriz que eu preciso dos pontos de rota do pedido e não inteira como em dijkstra
+
+const rotasDoPedido = gerarRotasDoPedido(pontosDoPedido);
+
+console.log("Rotas do pedido: ", rotasDoPedido);//o resultado aqui vai dar todas as possíveis rotas que o funcionário pode percorrer entre é claro os produtos que estão em seu pedido
+
+const resultadoTsp = encontrarMelhorRota(rotasDoPedido, matrizDoPedido);
+
+console.log("Melhor rota do pedido: ", resultadoTsp);//aqui exibe a melhor rota que poderíamos ter da entrada passando produto por produto e sua menor distÂncia
 
 function encontrarMelhorRota(rotas, matriz){
     let melhorRota = null;
