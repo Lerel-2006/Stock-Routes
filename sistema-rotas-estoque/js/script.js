@@ -6,6 +6,16 @@
     o TSP calcula apenas ponto a ponto, sem considerar corredores, prateleiras, etc
     como no mundo real e na representação 2d isso não pode acontecer
     Dijkstra → matriz → TSP → melhor ordem → caminhos físicos → desenho da rota.
+    ========================================
+    TSP:
+        Quais ordem visitar? sem considerar espaço físico, prateleira e nem nada
+
+    DIJKSTRA:
+        Quais nós físicos passar? Agora sim eu vejo a rota considerando os corredores, prateleiras
+
+    TSP decide onde ir primeiro
+
+    Dijkstra decide por onde passar para chegar lá
 */
 /* encontrarVizinhos() → quem está conectado a quem.
 calcularPesoAresta() → quanto custa cada conexão.
@@ -337,7 +347,7 @@ function dijkstra(idOrigem){
         predecessores: predecessores
     };
 }
-
+/* 
 const resultadoDijkstra = dijkstra(0);
 const distancias1 = dijkstra(1);
 const distancias2 = dijkstra(2);
@@ -345,6 +355,90 @@ const distancias2 = dijkstra(2);
 console.log("Entrada → Entrada:", resultadoDijkstra.distancias[0]);
 console.log("Entrada → Nó 1:", resultadoDijkstra.distancias[1]);
 console.log("Entrada → Nó 2:", resultadoDijkstra.distancias[2]);
+ */
+
+
+
+function reconstruirCaminho(idOrigem, idDestino, predecessores){
+
+    const caminho = [];
+
+    let noAtual = idDestino;
+
+    while(noAtual !== null){
+
+        caminho.push(noAtual);
+
+        if(noAtual === idOrigem){
+            break;
+        }
+
+        noAtual = predecessores[noAtual];
+
+    }
+
+    caminho.reverse();//precisa inverter os pontos do caminho, já que o caminho é feito de forma inversa,
+                      //já que pegamos qual o ponto chegar e vamos pegando seus predecessores, ponto a ponto e fazendo o caminho inverso
+                      //Porém como não podemos indicar para o usuário o caminho inverso, invertemos o vetor de caminho
+                      //Como o estoque é simples ele vai fazer o caminho de forma óbvia o caminho inverso, 3, 2, 1, 0
+                      //Então parece que é só contar de trás para frente e parece bobagem guardar os predecessores
+                      //Porém em um estoque grande e cheio de prateleiras o caminho inverso pode ser 4, 10, 1, 90, ...
+                      //Já que isso vai depender da maneira como o estoque foi construído e consequente o seu grafo
+                      //A intenção aqui é independente de como o usuário organize o estoque, o algoritmo seja eficaz em resolver qualquer disposição possível desse estoque/grafo
+                      //Questão de organização deixa para o usuário, o algoritmo deve ser adaptável ao que ele fizer
+    return caminho;
+}
+
+function encontrarCaminho(idOrigem, idDestino, resultadoDijkstra){
+
+    const resultado = resultadoDijkstra[idOrigem];
+
+    return reconstruirCaminho(
+        idOrigem,
+        idDestino, 
+        resultado.predecessores
+    );
+}
+
+//teste manual para reconstruir caminho, precisa da função construirCaminho() se quiser fazer com qualquer valor que o usuário digitar
+const resultadoTeste = dijkstra(3);
+const caminhoTeste = reconstruirCaminho(
+    3, 
+    5, 
+    resultadoTeste.predecessores
+);
+
+console.log("Caminho 0 -> 3: ", caminhoTeste);
+
+function criarCaminhosDaRota(resultadoTsp, pontosDoPedido, resultadoDijkstra){
+
+    const caminhos = [];
+
+    const rota = resultadoTsp.rota;
+
+    for(let i = 0; i < rota.length - 1; i++){
+
+        const indiceOrigem = rota[i];
+        const indiceDestino = rota[i + 1];
+
+        const pontoOrigem = pontosDoPedido[indiceOrigem];
+        const pontoDestino = pontosDoPedido[indiceDestino];
+
+        const caminho = encontrarCaminho(
+            pontoOrigem.noId,
+            pontoDestino.noId,
+            resultadoDijkstra
+        );
+
+        caminhos.push(caminho);
+    }
+
+    return caminhos;
+}
+
+
+
+
 
 //essa matriz contém todas as distâncias de ponto a ponto do estoque
 //depois passo para o tsp calcular qual rota é a menor
@@ -353,19 +447,42 @@ console.log("Entrada → Nó 2:", resultadoDijkstra.distancias[2]);
 function criarMatrizDijkstra(){
 
     const matriz = [];
+    const resultadosDijkstra = [];
 
     for(let i = 0; i < nos.length; i++){
-
+        //Vamos passar as distancias, quanto custa chegar e por onde passei, os predecessores, assim posso traçar a rota
         const resultado = dijkstra(i);
 
-        matriz.push(Object.values(resultado.distancias));
+        matriz.push(Object.values(resultado.distancias));//Guarda as distâncias
+
+        resultadosDijkstra.push(resultado);//Guarda cada execução do dijkstra, pra traçar a rota no mapa do estoque
+
     }
     
-    return matriz;
+    return {
+        matriz: matriz,
+        resultados: resultadosDijkstra
+    };
 }
 
 const matrizDijkstra = criarMatrizDijkstra();
+const caminhoFisico = encontrarCaminho(
+    0, 
+    3,
+    matrizDijkstra.resultados
+);
+
+console.log("Caminho físico: ", caminhoFisico);
+
 console.log("Matriz de Dijkstra: ", matrizDijkstra);
+
+const caminho = encontrarCaminho(
+    0,
+    3,
+    matrizDijkstra.resultados
+);
+
+console.log("Caminho encontrado: ", caminho);
 /*
 const distanciaTeste = criarDistancias(0);
 const visitadosTeste = criarVisitados();
@@ -773,7 +890,7 @@ function gerarRotasDoPedido(pontosDoPedido){
 
 const pontosDoPedido = criarPontosDoPedido(pedido);
 
-const matrizDoPedido = criarMatrizDoPedido(pontosDoPedido, matrizDijkstra);
+const matrizDoPedido = criarMatrizDoPedido(pontosDoPedido, matrizDijkstra.matriz);
 
 console.log("Matriz do pedido: ", matrizDoPedido);//aqui é somente a matriz que eu preciso dos pontos de rota do pedido e não inteira como em dijkstra
 
@@ -784,6 +901,15 @@ console.log("Rotas do pedido: ", rotasDoPedido);//o resultado aqui vai dar todas
 const resultadoTsp = encontrarMelhorRota(rotasDoPedido, matrizDoPedido);
 
 console.log("Melhor rota do pedido: ", resultadoTsp);//aqui exibe a melhor rota que poderíamos ter da entrada passando produto por produto e sua menor distÂncia
+
+const caminhosDaRota = criarCaminhosDaRota(
+    resultadoTsp,
+    pontosDoPedido,
+    matrizDijkstra.resultados
+);
+
+console.log("Caminhos físicos da rota:", caminhosDaRota);
+
 
 function encontrarMelhorRota(rotas, matriz){
     let melhorRota = null;
