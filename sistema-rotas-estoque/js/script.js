@@ -888,6 +888,44 @@ function gerarRotasDoPedido(pontosDoPedido){
     return rotas;
 }
 
+function desenharCaminho(caminho){
+
+    for(let i = 0; i < caminho.length - 1; i++){
+
+        const idOrigem = caminho[i];
+        const idDestino = caminho[i + 1];
+
+        const origem = nos[idOrigem];
+        const destino = nos[idDestino];
+
+        const dx = destino.x - origem.x;
+        const dy = destino.y - origem.y;
+
+        const distancia = Math.sqrt(dx * dx + dy * dy);
+
+        const angulo = Math.atan2(dy, dx) * 180 / Math.PI;
+
+        const linha = document.createElement("div");
+
+        linha.classList.add("caminho-fisico");
+        //vermelho = rota antiga direta
+        //verde = caminho físico real
+        //azul = arestas originais do grafo
+
+        linha.style.left = `${origem.x}px`;
+        linha.style.top = `${origem.y}px`;
+        linha.style.width = `${distancia}px`;
+
+        linha.style.transform = `rotate(${angulo}deg)`;
+
+        estoque.appendChild(linha);
+    }
+}
+
+function juntarCaminhos(caminhos){
+    
+}
+
 const pontosDoPedido = criarPontosDoPedido(pedido);
 
 const matrizDoPedido = criarMatrizDoPedido(pontosDoPedido, matrizDijkstra.matriz);
@@ -909,6 +947,15 @@ const caminhosDaRota = criarCaminhosDaRota(
 );
 
 console.log("Caminhos físicos da rota:", caminhosDaRota);
+
+caminhosDaRota.forEach(caminho => {
+    desenharCaminho(caminho);
+    //o for each pega cada caminho de ponto a ponto dentro rota, que envolve os corredores e não somente os pontos do produto e vai desenhando as linhas
+    //exemplo
+    //[0, 1, 2, 3] primeira parte do trajeto
+    //[3, 4, 5]//segunda parte
+    //ele não faz tudo de uma só vez e sim por partes
+});
 
 
 function encontrarMelhorRota(rotas, matriz){
