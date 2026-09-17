@@ -922,9 +922,135 @@ function desenharCaminho(caminho){
     }
 }
 
+//como o final da de cada função é o mesmo ponto do início de uma nova
+//ex: [1, 2, 3]
+//    [3, 4, 5]
+//Não queremos isso, então é necessário quando o caminho for juntado
+//que ele fique assim [1, 2, 3, 4, 5] e não
+//                    [1, 2, 3, 3, 4, 5]
 function juntarCaminhos(caminhos){
     
+    const caminhoCompleto = [];
+
+    caminhos.forEach((caminho, indice) => {
+
+        if(indice === 0){
+            caminhoCompleto.push(...caminho);
+            //sem spread ...
+            //[
+                //[0, 1, 2, 3],
+                //[4, 5]
+            //]
+            //com spread
+            //[
+                //0, 1, 2, 3, 4, 5
+            //]
+        }else{
+            caminhoCompleto.push(...caminho.slice(1));//vai tirar o ponto repetido
+        }
+
+    });
+
+    return caminhoCompleto;
 }
+
+function desenharCaminhoCompleto(caminho){
+
+    for(let i = 0; i < caminho.length - 1; i++){
+
+        const idOrigem = caminho[i];
+        const idDestino = caminho[i + 1];
+
+        const origem = nos[idOrigem];
+        const destino = nos[idDestino];
+
+        const dx = destino.x - origem.x;
+        const dy = destino.y - origem.y;
+
+        const distancia = Math.sqrt(dx * dx + dy *dy);
+
+        const angulo = Math.atan2(dy, dx) * 180 / Math.PI;
+
+        const linha = document.createElement("div");
+
+        linha.classList.add("caminho-fisico");
+
+        linha.style.left = `${origem.x}px`;
+        linha.style.top = `${origem.y}px`;
+        linha.style.width = `${distancia}px`;
+
+        linha.style.transform = `rotate(${angulo}deg)`;
+
+        estoque.appendChild(linha);
+    }
+
+}
+/* 
+Posição real do produto:
+
+P1 (150, 100)
+
+Nó de acesso:
+
+Nó 3 (150, 200)
+ */
+
+//serve para colocar uma indicação na rota quais produtos ele deve pegar
+function desenharAcessoAPosicao(posicaoId){
+
+    const posicao = posicoes.find(
+        posicao => posicao.id === posicaoId
+    );
+
+    const no = encontrarNoDaPosicao(posicaoId);
+
+    const dx = posicao.x - no.x;
+    const dy = posicao.y - no.y;
+
+    const distancia = Math.sqrt(dx * dx + dy * dy);
+
+    const angulo = Math.atan2(dy, dx) * 180 / Math.PI; //o ângulo é necessío pq   alinha é criada na horizontal no html, então vamos precisar girar
+
+    const linha = document.createElement("div");
+
+    linha.classList.add("acesso-posicao");
+
+    linha.style.left = `${no.x}px`;//onde a linha começa
+    linha.style.top = `${no.y}px`;//onde a linha começa
+    linha.style.width = `${distancia}px`;//comprimento da linha
+    linha.style.transform = `rotate(${angulo}deg)`;
+
+    estoque.appendChild(linha);
+}
+
+//para não ter que passar manualmente cada posição vamos percorrer todos os pontos do pedido
+function desenharAcessoDoPedido(){
+
+    pedido.forEach(item => {
+
+        const produto = encontrarProduto(item.produtoId);
+        const posicao = encontrarPosicaoDoProduto(produto);
+
+        desenharAcessoAPosicao(posicao.id);
+    });
+
+}
+
+function desenharAcessoDaRota(){
+
+    resultadoTsp.rota.forEach(indice => {
+
+        const ponto = pontosDoPedido[indice];
+
+        if(indice === 0){
+            return;
+        }
+    });
+
+}
+
+//desenharAcessoAPosicao(1);
+desenharAcessoDoPedido();
 
 const pontosDoPedido = criarPontosDoPedido(pedido);
 
@@ -948,6 +1074,7 @@ const caminhosDaRota = criarCaminhosDaRota(
 
 console.log("Caminhos físicos da rota:", caminhosDaRota);
 
+/*
 caminhosDaRota.forEach(caminho => {
     desenharCaminho(caminho);
     //o for each pega cada caminho de ponto a ponto dentro rota, que envolve os corredores e não somente os pontos do produto e vai desenhando as linhas
@@ -956,6 +1083,12 @@ caminhosDaRota.forEach(caminho => {
     //[3, 4, 5]//segunda parte
     //ele não faz tudo de uma só vez e sim por partes
 });
+*/
+const caminhoCompleto = juntarCaminhos(caminhosDaRota);
+
+console.log("Caminho completo: ", caminhoCompleto);
+
+desenharCaminhoCompleto(caminhoCompleto);
 
 
 function encontrarMelhorRota(rotas, matriz){
