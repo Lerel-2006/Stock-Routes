@@ -118,3 +118,11 @@ body{
     transform-origin: left center;
     z-index: 5;
 }
+
+.caminho-fisico{
+    position: absolute;
+    height: 5px;
+    background-color: green;
+    transform-origin: left center;
+    z-index: 15;
+}
