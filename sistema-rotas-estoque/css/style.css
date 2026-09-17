@@ -126,3 +126,11 @@ body{
     transform-origin: left center;
     z-index: 15;
 }
+
+.acesso-posicao{
+    position: absolute;
+    height: 3px;
+    background-color: orange;
+    transform-origin: left center;
+    z-index: 15;
+}
