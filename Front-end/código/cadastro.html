@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastrar usuário</title>
+</head>
+<body>
+  <h1>Cadastrar usuário</h1>
+
+  <form id="form-cadastro" action="#" method="post">
+    <p>
+      <label for="cadastro-nome">Nome</label><br>
+      <input type="text" id="cadastro-nome" name="nome" required autocomplete="name">
+    </p>
+    <p>
+      <label for="cadastro-email">E-mail</label><br>
+      <input type="email" id="cadastro-email" name="email" required autocomplete="email">
+    </p>
+    <p>
+      <label for="cadastro-senha">Senha</label><br>
+      <input type="password" id="cadastro-senha" name="senha" required minlength="4" autocomplete="new-password">
+    </p>
+    <p>
+      <button type="submit">Cadastrar</button>
+    </p>
+  </form>
+
+  <p id="cadastro-erro" role="alert"></p>
+  <p id="cadastro-sucesso" role="status"></p>
+
+  <p><a href="login.html">Voltar ao login</a></p>
+
+</body>
+</html>
