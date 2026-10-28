@@ -43,4 +43,3 @@ CREATE TABLE movimentacao_estoque(
     FOREIGN KEY(estante_id) REFERENCES estantes(id),
     FOREIGN KEY(produto_id) REFERENCES produtos(id)
 );
-

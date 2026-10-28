@@ -44,4 +44,4 @@ SELECT
     estante_produto.andar,
     estante_produto.quantidade
 FROM estante_produto JOIN produtos 
-ON estante_produto.produto_id = produtos.id;
+ON estante_produto.produto_id = produtos.id; No newline at end of file
