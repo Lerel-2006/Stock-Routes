@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
-class Funcionario extends Model
+class Funcionario extends Authenticatable
 {
+    use HasApiTokens;
     protected $table = 'funcionarios';
 
     protected $fillable = [
