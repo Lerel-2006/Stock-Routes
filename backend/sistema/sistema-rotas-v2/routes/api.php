@@ -11,10 +11,10 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::get('/produtos', [ProdutoController::class, 'index']);
+Route::get('/produtos', [ProdutoController::class, 'index'])->middleware('auth:sanctum');
 
-Route::get('/arestas', [ArestaController::class, 'index']);
+Route::get('/arestas', [ArestaController::class, 'index'])->middleware('auth:sanctum');
 
-Route::get('/estantes', [EstanteCOntroller::class, 'index']);
+Route::get('/estantes', [EstanteController::class, 'index'])->middleware('auth:sanctum');
 
 Route::post('/login', [AuthController::class, 'login']);
