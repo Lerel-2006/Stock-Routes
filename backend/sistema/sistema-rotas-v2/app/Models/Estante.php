@@ -10,4 +10,8 @@ class Estante extends Model
     protected $fillable = [
         'codigo',
     ];
+
+    public function produto(): HasOne{
+        return $this->hasOne(Produto::class);
+    }
 }
