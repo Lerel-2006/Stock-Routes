@@ -30,8 +30,9 @@ class AuthController extends Controller
             'token' => $token,
             'funcionario' => $funcionario
         ]);
-
-        
     }
     
+    pulbic function logout(Request $request){
+        $request->user()->
+    }
 }
