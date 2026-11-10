@@ -6,6 +6,7 @@ use App\Models\Funcionario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
+
 class AuthController extends Controller
 {
     public function login(Request $request){
@@ -14,7 +15,7 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        $funcionario = Funcionario::where('email', $dados['email']) ->first();
+        $funcionario = Funcionario::where('email', $dados['email'])->first();
 
         if(!$funcionario || !Hash::check($dados['password'], $funcionario->password)){
             return response()->json([
