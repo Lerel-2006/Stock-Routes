@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\ArestaController;
+use App\Http\Controllers\EstanteController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -12,3 +13,5 @@ Route::get('/user', function (Request $request) {
 Route::get('/produtos', [ProdutoController::class, 'index']);
 
 Route::get('/arestas', [ArestaController::class, 'index']);
+
+Route::get('/estantes', [EstanteCOntroller::class, 'index']);
