@@ -1,16 +1,7 @@
 import { useState } from 'react'
 import '../styles/Catalogo.css'
 
-const PRODUTOS = [
-  { id: 1, nome: 'Pc RTX4060', quantidade: 37, local: 'A3' },
-  { id: 2, nome: 'Pc RTX3060', quantidade: 59, local: 'A4' },
-  { id: 3, nome: 'Mouse', quantidade: 183, local: 'A1' },
-  { id: 4, nome: 'Teclado', quantidade: 22, local: 'B5' },
-  { id: 5, nome: 'Pc AMD', quantidade: 53, local: 'B9' },
-  { id: 6, nome: 'Celular POCO', quantidade: 187, local: 'C1' },
-  { id: 7, nome: 'NotGamer', quantidade: 57, local: 'A3' },
-  { id: 8, nome: 'Placa de video', quantidade: 82, local: 'C4' },
-]
+
 
 function IconSearch() {
   return (
@@ -22,12 +13,37 @@ function IconSearch() {
 }
 
 function Catalogo() {
-  const [busca, setBusca] = useState('')
-  const [selecionados, setSelecionados] = useState([])
+    const [produtos, setProdutos] = useState([])
+    const [busca, setBusca] = useState('')
+    const [selecionados, setSelecionados] = useState([])
+    const [carregando, setCarregando] = useState(true)
+    const [erro, setErro] = useState('')
 
-  const produtosFiltrados = PRODUTOS.filter((produto) =>
-    produto.nome.toLowerCase().includes(busca.trim().toLowerCase())
-  )
+
+      useEffect(() => {
+    fetch('http://127.0.0.1:8000/api/produtos')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Erro ao buscar produtos')
+        }
+
+        return response.json()
+      })
+      .then(dados => {
+        setProdutos(dados)
+      })
+      .catch(() => {
+        setErro('Não foi possível carregar os produtos.')
+      })
+      .finally(() => {
+        setCarregando(false)
+      })
+      }, [])
+
+
+  const produtosFiltrados = produtos.filter((produto) =>
+  produto.nome.toLowerCase().includes(busca.trim().toLowerCase())
+)
 
   function alternarProduto(id) {
     setSelecionados((atual) =>
