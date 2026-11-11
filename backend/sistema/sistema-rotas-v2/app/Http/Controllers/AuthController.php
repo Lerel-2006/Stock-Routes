@@ -32,7 +32,9 @@ class AuthController extends Controller
         ]);
     }
     
+    /*
     pulbic function logout(Request $request){
         $request->user()->
     }
+    */
 }
