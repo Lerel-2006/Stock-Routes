@@ -10,12 +10,13 @@ function IconSearch() {
   )
 }
 
-function Catalogo() {
+function Catalogo({ onConfirmarRota }) {
   const [produtos, setProdutos] = useState([])
   const [busca, setBusca] = useState('')
   const [selecionados, setSelecionados] = useState([])
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState('')
+  const [confirmarAberto, setConfirmarAberto] = useState(false)
 
   useEffect(() => {
     fetch('http://127.0.0.1:8000/api/produtos')
@@ -48,6 +49,23 @@ function Catalogo() {
         : [...atual, id]
     )
   }
+
+  const produtosSelecionados = selecionados
+    .map((id) => produtos.find((produto) => produto.id === id))
+    .filter(Boolean)
+
+  useEffect(() => {
+    if (!confirmarAberto) return
+
+    function fecharComEscape(event) {
+      if (event.key === 'Escape') {
+        setConfirmarAberto(false)
+      }
+    }
+
+    window.addEventListener('keydown', fecharComEscape)
+    return () => window.removeEventListener('keydown', fecharComEscape)
+  }, [confirmarAberto])
 
   return (
     <div className="catalogo">
@@ -94,12 +112,57 @@ function Catalogo() {
         })}
       </section>
 
-      <button type="button" className="catalogo-rota">
+      <button type="button" className="catalogo-rota" onClick={() => setConfirmarAberto(true)}>
         {selecionados.length > 1 ? (
           <span className="catalogo-rota-badge">{selecionados.length}</span>
         ) : null}
         Rota
       </button>
+
+      {confirmarAberto && (
+        <div className="catalogo-modal-fundo" onClick={() => setConfirmarAberto(false)}>
+          <div
+            className="catalogo-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirmar-rota-titulo"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="confirmar-rota-titulo">Confirmar Rota?</h2>
+
+            {produtosSelecionados.length > 0 ? (
+              <ul className="catalogo-modal-produtos">
+                {produtosSelecionados.map((produto) => (
+                  <li key={produto.id}>{produto.nome}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="catalogo-modal-vazio">Nenhum produto selecionado.</p>
+            )}
+
+            <div className="catalogo-modal-acoes">
+              <button
+                type="button"
+                className="catalogo-modal-sim"
+                onClick={() => {
+                  if (produtosSelecionados.length === 0) return
+                  setConfirmarAberto(false)
+                  onConfirmarRota?.(produtosSelecionados)
+                }}
+              >
+                Sim
+              </button>
+              <button
+                type="button"
+                className="catalogo-modal-nao"
+                onClick={() => setConfirmarAberto(false)}
+              >
+                Não
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

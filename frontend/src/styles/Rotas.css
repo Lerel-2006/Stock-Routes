@@ -1,0 +1,199 @@
+.rotas {
+  min-height: 100svh;
+  background: #d8d8d8;
+  padding: 28px 36px 40px;
+  font-family: Inter, 'Segoe UI', system-ui, sans-serif;
+  color: #4a4a4a;
+}
+
+.rotas-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.rotas-header h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #3f3f3f;
+  letter-spacing: -0.4px;
+}
+
+.rotas-header p {
+  margin: 6px 0 0;
+  font-size: 16px;
+  color: #6b6b6b;
+}
+
+.rotas-voltar {
+  height: 42px;
+  min-width: 110px;
+  border: 0;
+  border-radius: 10px;
+  background: #1e88e5;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rotas-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 28px;
+  align-items: start;
+}
+
+.rotas-mapa {
+  min-height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.rotas-mapa svg {
+  width: 75%;
+  max-width: 650px;
+  height: auto;
+  display: block;
+}
+
+.rotas-aresta {
+  stroke: #8d8d8d;
+  stroke-width: 4;
+}
+
+.rotas-no circle {
+  fill: #a3a3a3;
+}
+
+.rotas-no-pendente circle,
+.rotas-no-atual circle {
+  fill: #f4e04a;
+}
+
+.rotas-no-atual circle {
+  stroke: #1e88e5;
+  stroke-width: 4;
+}
+
+.rotas-no-coletada circle {
+  fill: #43a047;
+}
+
+.rotas-no text {
+  fill: #3f3f3f;
+  font-size: 15px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.rotas-no-coletada text {
+  fill: #fff;
+}
+
+.rotas-painel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 12px;
+  border: 3px solid #1e88e5;
+  border-radius: 10px;
+  background: #cfcfcf;
+}
+
+.rotas-atual,
+.rotas-lista {
+  margin: 0;
+  padding: 16px;
+  border-radius: 8px;
+  background: #c0c0c0;
+}
+
+.rotas-atual h2 {
+  margin: 0 0 12px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #3f3f3f;
+}
+
+.rotas-atual p,
+.rotas-item {
+  margin: 0;
+  font-size: 16px;
+  color: #4e4e4e;
+}
+
+.rotas-produto-nome {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.rotas-posicao {
+  margin-top: 4px;
+}
+
+.rotas-confirmar {
+  width: 100%;
+  height: 42px;
+  margin-top: 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #1e88e5;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rotas-conclusao {
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.rotas-lista {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rotas-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rotas-item-marca {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #a3a3a3;
+  flex-shrink: 0;
+}
+
+.rotas-item-atual .rotas-item-marca,
+.rotas-item-pendente .rotas-item-marca {
+  background: #f4e04a;
+}
+
+.rotas-item-coletada .rotas-item-marca {
+  background: #43a047;
+}
+
+@media (max-width: 900px) {
+  .rotas {
+    padding: 20px;
+  }
+
+  .rotas-header h1 {
+    font-size: 26px;
+  }
+
+  .rotas-layout {
+    grid-template-columns: 1fr;
+  }
+}
