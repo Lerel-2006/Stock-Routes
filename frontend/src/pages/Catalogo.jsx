@@ -1,7 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import '../styles/Catalogo.css'
-
-
 
 function IconSearch() {
   return (
@@ -13,14 +11,13 @@ function IconSearch() {
 }
 
 function Catalogo() {
-    const [produtos, setProdutos] = useState([])
-    const [busca, setBusca] = useState('')
-    const [selecionados, setSelecionados] = useState([])
-    const [carregando, setCarregando] = useState(true)
-    const [erro, setErro] = useState('')
+  const [produtos, setProdutos] = useState([])
+  const [busca, setBusca] = useState('')
+  const [selecionados, setSelecionados] = useState([])
+  const [carregando, setCarregando] = useState(true)
+  const [erro, setErro] = useState('')
 
-
-      useEffect(() => {
+  useEffect(() => {
     fetch('http://127.0.0.1:8000/api/produtos')
       .then(response => {
         if (!response.ok) {
@@ -38,16 +35,17 @@ function Catalogo() {
       .finally(() => {
         setCarregando(false)
       })
-      }, [])
-
+  }, [])
 
   const produtosFiltrados = produtos.filter((produto) =>
-  produto.nome.toLowerCase().includes(busca.trim().toLowerCase())
-)
+    produto.nome.toLowerCase().includes(busca.trim().toLowerCase())
+  )
 
   function alternarProduto(id) {
     setSelecionados((atual) =>
-      atual.includes(id) ? atual.filter((item) => item !== id) : [...atual, id]
+      atual.includes(id)
+        ? atual.filter((item) => item !== id)
+        : [...atual, id]
     )
   }
 
@@ -68,8 +66,16 @@ function Catalogo() {
         <p>Encontre o que você precisa de forma rápida</p>
       </header>
 
+      {carregando && <p>Carregando produtos...</p>}
+
+      {erro && <p>{erro}</p>}
+
+      {!carregando && !erro && produtosFiltrados.length === 0 && (
+        <p>Nenhum produto encontrado.</p>
+      )}
+
       <section className="catalogo-grid">
-        {produtosFiltrados.map((produto) => {
+        {!carregando && !erro && produtosFiltrados.map((produto) => {
           const ativo = selecionados.includes(produto.id)
 
           return (
@@ -81,8 +87,8 @@ function Catalogo() {
               aria-pressed={ativo}
             >
               <strong>{produto.nome}</strong>
-              <span>quantidade: {produto.quantidade}</span>
-              <span>{produto.local}</span>
+              <span>Quantidade: {produto.quantidade}</span>
+              <span>Estante: {produto.estante_id}</span>
             </button>
           )
         })}
