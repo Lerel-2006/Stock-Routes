@@ -23,12 +23,15 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $token = $funcionario->createToken('token-funcionario')->plainTextToken;
+        //$token = $funcionario->createToken('token-funcionario')->plainTextToken;//Depois se der tempo eu faço com token
 
         return response()->json([
             'mensagem' => 'Login Realizado com sucesso!',
-            'token' => $token,
-            'funcionario' => $funcionario
+            //'token' => $token,//Depois se der tempo eu faço com token
+            'funcionario' => [
+                'id' => $funcionario->id,
+                'email' => $funcionario->email
+            ]
         ]);
     }
     
