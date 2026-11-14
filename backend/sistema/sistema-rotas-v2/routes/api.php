@@ -21,4 +21,7 @@ Route::get('/estantes', [EstanteController::class, 'index']);
 
 Route::post('/login', [AuthController::class, 'login']);
 
+
 Route::post('/rotas/calcular', [RotaController::class, 'calcular']);
+
+Route::post('/rota-coleta', [RotaController::class, 'coleta']);
