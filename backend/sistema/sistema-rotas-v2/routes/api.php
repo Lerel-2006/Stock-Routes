@@ -6,6 +6,7 @@ use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\ArestaController;
 use App\Http\Controllers\EstanteController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RotaController;
 
 /*
 Route::get('/user', function (Request $request) {
@@ -19,3 +20,5 @@ Route::get('/arestas', [ArestaController::class, 'index']);
 Route::get('/estantes', [EstanteController::class, 'index']);
 
 Route::post('/login', [AuthController::class, 'login']);
+
+Route::post('/rotas/calcular', [RotaController::class, 'calcular']);
