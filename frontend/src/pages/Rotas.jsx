@@ -25,31 +25,39 @@ function idDaEstante(produto, estantesPorId) {
   return null
 }
 
+
 function calcularPosicoes(estantes) {
-  const ordenadas = [...estantes].sort((a, b) =>
-    String(a.codigo).localeCompare(String(b.codigo), 'pt-BR')
-  )
-  const colunas = Math.max(1, Math.ceil(Math.sqrt(ordenadas.length)))
   const espacoX = 120
   const espacoY = 110
-  const margem = 58
+  const margem = 70
+  const colunas = 5
   const mapa = new Map()
 
-  ordenadas.forEach((estante, indice) => {
+  estantes.forEach((estante) => {
+    if (estante.codigo === 'ENTRADA') {
+      mapa.set(estante.id, {
+        x: margem,
+        y: margem
+      })
+      return
+    }
+
+    const numero = Number(estante.codigo.substring(1))
+    const indice = numero - 1
+
     mapa.set(estante.id, {
       x: margem + (indice % colunas) * espacoX,
-      y: margem + Math.floor(indice / colunas) * espacoY,
+      y: margem + espacoY + Math.floor(indice / colunas) * espacoY
     })
   })
 
-  const linhas = Math.ceil(ordenadas.length / colunas) || 1
-
   return {
     mapa,
-    largura: margem * 2 + Math.max(0, colunas - 1) * espacoX,
-    altura: margem * 2 + Math.max(0, linhas - 1) * espacoY,
+    largura: margem * 2 + (colunas - 1) * espacoX,
+    altura: margem * 2 + 4 * espacoY
   }
 }
+
 
 function indiceNaSequencia(parada, dikstra) {
   return dikstra.findIndex((posicao) => {
