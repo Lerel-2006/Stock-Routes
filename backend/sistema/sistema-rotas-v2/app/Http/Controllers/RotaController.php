@@ -31,23 +31,34 @@ class RotaController extends Controller
         ]);
     }
 
-    public function coleta(Request $request, RotaColetaService $service)
-    {
-        $dados = $request->validate([
-            'produtos'   => 'required|array|min:1',
-            'produtos.*' => 'integer|exists:produtos,id',
-            'inicio'     => 'nullable|string|exists:estantes,codigo',
-        ]);
+    
+public function coleta(Request $request, RotaColetaService $service)
+{
+    $dados = $request->validate([
+        'produtos'   => 'required|array|min:1',
+        'produtos.*' => 'required|integer|distinct|exists:produtos,id',
+        'inicio'     => 'nullable|string|exists:estantes,codigo',
+    ]);
 
-        try {
-            $rota = $service->gerar($dados['produtos'], $dados['inicio'] ?? 'Entrada');
-        } catch (InvalidArgumentException $e) {
-            return response()->json(['erro' => $e->getMessage()], 422);
-        }
+    try {
+        $inicio = $dados['inicio'] ?? 'E01';
 
+        $rota = $service->gerar(
+        $dados['produtos'],'E01'
+        );
+
+    } catch (InvalidArgumentException $e) {
         return response()->json([
-            'rota' => $rota,
-            'distancia_total' => array_sum(array_column($rota, 'distancia')),
-        ]);
+            'erro' => $e->getMessage()
+        ], 422);
     }
+
+    return response()->json([
+        'rota' => $rota,
+        'distancia_total' => array_sum(
+            array_column($rota, 'distancia')
+        )
+    ]);
+}
+
 }
