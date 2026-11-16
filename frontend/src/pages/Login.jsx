@@ -1,22 +1,20 @@
 import { useState } from 'react'
 import '../styles/Login.css'
-import logo from "../../img/logost.png";
+import logo from "../../img/logost.png"
+
+const API = 'http://127.0.0.1:8000/api'
 
 function Logo() {
-    return (
-      
-        <div className="login-header">
-            <img 
-                src={logo} 
-                alt="Stock Routes" 
-                className="login-logo" 
-            />
-            <p className="login-description">
-                Seu estoque, sempre no lugar certo.
-            </p>
-        </div>
-    );
+  return (
+    <div className="login-header">
+      <img src={logo} alt="Stock Routes" className="login-logo" />
+      <p className="login-description">
+        Seu estoque, sempre no lugar certo.
+      </p>
+    </div>
+  )
 }
+
 function IconMail() {
   return (
     <svg viewBox="0 0 24 24" className="login-icon" aria-hidden="true">
@@ -68,13 +66,53 @@ function Login({ onLogin }) {
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [mostrarSenha, setMostrarSenha] = useState(false)
+  const [carregando, setCarregando] = useState(false)
+  const [erro, setErro] = useState('')
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
-    onLogin?.()
+
+    setErro('')
+    setCarregando(true)
+
+    try {
+      const response = await fetch(`${API}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          email: email,
+          password: senha
+        })
+      })
+
+      const dados = await response.json()
+
+      if (!response.ok) {
+        throw new Error(dados.mensagem || 'E-mail ou senha inválidos.')
+      }
+
+      if (!dados.token) {
+        throw new Error('O servidor não retornou o token de acesso.')
+      }
+
+      // Guardar o token e os dados do funcionário.
+      localStorage.setItem('token', dados.token)
+      localStorage.setItem('funcionario', JSON.stringify(dados.funcionario))
+
+      // Avisar ao App que o login foi realizado.
+      onLogin?.(dados.funcionario, dados.token)
+
+    } catch (error) {
+      setErro(error.message || 'Não foi possível conectar ao servidor.')
+    } finally {
+      setCarregando(false)
+    }
   }
 
-   return (
+  return (
     <div className="login">
 
       <Logo />
@@ -108,6 +146,7 @@ function Login({ onLogin }) {
                 autoComplete="current-password"
                 required
               />
+
               <button
                 type="button"
                 className="login-toggle"
@@ -119,12 +158,21 @@ function Login({ onLogin }) {
             </span>
           </label>
 
-          <button type="submit" className="login-submit">
-            Entrar
-          </button>
-        </form>
+          {erro && (
+            <p className="login-erro">
+              {erro}
+            </p>
+          )}
 
-        
+          <button
+            type="submit"
+            className="login-submit"
+            disabled={carregando}
+          >
+            {carregando ? 'Entrando...' : 'Entrar'}
+          </button>
+
+        </form>
       </section>
     </div>
   )

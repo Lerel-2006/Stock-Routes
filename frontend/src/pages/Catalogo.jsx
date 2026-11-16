@@ -1,5 +1,8 @@
+
 import { useState, useEffect } from 'react'
 import '../styles/Catalogo.css'
+
+const API = 'http://127.0.0.1:8000/api'
 
 function IconSearch() {
   return (
@@ -10,7 +13,7 @@ function IconSearch() {
   )
 }
 
-function Catalogo({ onConfirmarRota }) {
+function Catalogo({ onConfirmarRota, token, onSair }) {
   const [produtos, setProdutos] = useState([])
   const [busca, setBusca] = useState('')
   const [selecionados, setSelecionados] = useState([])
@@ -18,25 +21,62 @@ function Catalogo({ onConfirmarRota }) {
   const [erro, setErro] = useState('')
   const [confirmarAberto, setConfirmarAberto] = useState(false)
 
+  async function handleSair() {
+    try {
+      await fetch(`${API}/logout`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+    } catch (erro) {
+      console.error('Não foi possível encerrar a sessão no servidor.')
+    } finally {
+      onSair?.()
+    }
+  }
+
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/produtos')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Erro ao buscar produtos')
+    async function buscarProdutos() {
+      try {
+        setCarregando(true)
+        setErro('')
+
+        const response = await fetch(`${API}/produtos`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        })
+
+        if (response.status === 401) {
+          onSair?.()
+          throw new Error('Sua sessão expirou. Faça login novamente.')
         }
 
-        return response.json()
-      })
-      .then(dados => {
+        if (!response.ok) {
+          throw new Error('Erro ao buscar produtos.')
+        }
+
+        const dados = await response.json()
         setProdutos(dados)
-      })
-      .catch(() => {
-        setErro('Não foi possível carregar os produtos.')
-      })
-      .finally(() => {
+
+      } catch (erro) {
+        setErro(erro.message || 'Não foi possível carregar os produtos.')
+      } finally {
         setCarregando(false)
-      })
-  }, [])
+      }
+    }
+
+    if (token) {
+      buscarProdutos()
+    } else {
+      setErro('Usuário não autenticado.')
+      setCarregando(false)
+    }
+  }, [token, onSair])
 
   const produtosFiltrados = produtos.filter((produto) =>
     produto.nome.toLowerCase().includes(busca.trim().toLowerCase())
@@ -64,11 +104,21 @@ function Catalogo({ onConfirmarRota }) {
     }
 
     window.addEventListener('keydown', fecharComEscape)
+
     return () => window.removeEventListener('keydown', fecharComEscape)
   }, [confirmarAberto])
 
   return (
     <div className="catalogo">
+
+      <button
+        type="button"
+        className="catalogo-logout"
+        onClick={handleSair}
+      >
+        Sair
+      </button>
+
       <label className="catalogo-search">
         <IconSearch />
         <input
@@ -112,7 +162,11 @@ function Catalogo({ onConfirmarRota }) {
         })}
       </section>
 
-      <button type="button" className="catalogo-rota" onClick={() => setConfirmarAberto(true)}>
+      <button
+        type="button"
+        className="catalogo-rota"
+        onClick={() => setConfirmarAberto(true)}
+      >
         {selecionados.length > 1 ? (
           <span className="catalogo-rota-badge">{selecionados.length}</span>
         ) : null}
@@ -120,7 +174,10 @@ function Catalogo({ onConfirmarRota }) {
       </button>
 
       {confirmarAberto && (
-        <div className="catalogo-modal-fundo" onClick={() => setConfirmarAberto(false)}>
+        <div
+          className="catalogo-modal-fundo"
+          onClick={() => setConfirmarAberto(false)}
+        >
           <div
             className="catalogo-modal"
             role="dialog"
@@ -137,7 +194,9 @@ function Catalogo({ onConfirmarRota }) {
                 ))}
               </ul>
             ) : (
-              <p className="catalogo-modal-vazio">Nenhum produto selecionado.</p>
+              <p className="catalogo-modal-vazio">
+                Nenhum produto selecionado.
+              </p>
             )}
 
             <div className="catalogo-modal-acoes">
@@ -146,12 +205,14 @@ function Catalogo({ onConfirmarRota }) {
                 className="catalogo-modal-sim"
                 onClick={() => {
                   if (produtosSelecionados.length === 0) return
+
                   setConfirmarAberto(false)
                   onConfirmarRota?.(produtosSelecionados)
                 }}
               >
                 Sim
               </button>
+
               <button
                 type="button"
                 className="catalogo-modal-nao"

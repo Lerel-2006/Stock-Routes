@@ -1,3 +1,4 @@
+
 .rotas {
   min-height: 100svh;
   background: #d8d8d8;
@@ -65,6 +66,13 @@
   stroke-width: 4;
 }
 
+/* Arestas percorridas pelo Dijkstra */
+.rotas-aresta-ativa {
+  stroke: #1687e8 !important;
+  stroke-width: 7 !important;
+  stroke-linecap: round;
+}
+
 .rotas-no circle {
   fill: #a3a3a3;
 }
@@ -93,6 +101,13 @@
 
 .rotas-no-coletada text {
   fill: #fff;
+}
+
+/* Identificação da entrada */
+.rotas-entrada text {
+  fill: #1687e8;
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .rotas-painel {
@@ -134,6 +149,10 @@
 
 .rotas-posicao {
   margin-top: 4px;
+}
+
+.rotas-distancia {
+  margin-bottom: 4px !important;
 }
 
 .rotas-confirmar {
@@ -184,6 +203,7 @@
   background: #43a047;
 }
 
+/* Responsividade */
 @media (max-width: 900px) {
   .rotas {
     padding: 20px;
@@ -195,5 +215,15 @@
 
   .rotas-layout {
     grid-template-columns: 1fr;
+  }
+
+  .rotas-mapa svg {
+    width: 100%;
+    max-width: 650px;
+  }
+
+  .rotas-painel {
+    width: 100%;
+    box-sizing: border-box;
   }
 }

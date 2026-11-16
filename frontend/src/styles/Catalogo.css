@@ -206,6 +206,30 @@
   place-items: center;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
+.catalogo-logout {
+  position: absolute;
+  top: 28px;
+  right: 48px;
+  height: 42px;
+  min-width: 100px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 10px;
+  background: #1e88e5;
+  color: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.catalogo-logout:hover {
+  background: #1976d2;
+  transform: translateY(-2px);
+}
+
+
 
 @media (max-width: 980px) {
   .catalogo {
@@ -225,4 +249,13 @@
   .catalogo-grid {
     grid-template-columns: 1fr;
   }
+
+  .catalogo-logout {
+  top: 16px;
+  right: 20px;
+  height: 36px;
+  min-width: 80px;
+  font-size: 13px;
+}
+  
 }
