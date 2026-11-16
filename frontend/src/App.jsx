@@ -11,9 +11,8 @@ function App() {
     return localStorage.getItem('token') || ''
   })
 
-  const [tela, setTela] = useState(() => {
-    return localStorage.getItem('token') ? 'catalogo' : 'login'
-  })
+  // Sempre iniciar na tela de login
+  const [tela, setTela] = useState('login')
 
   const [produtosRota, setProdutosRota] = useState([])
   const [rotaCalculada, setRotaCalculada] = useState([])

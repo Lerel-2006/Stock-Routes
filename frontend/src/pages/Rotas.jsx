@@ -150,7 +150,6 @@ function Rotas({
   onVoltar,
   rotaCalculada = [],
   dikstra = null,
-  distanciaTotal = 0,
 }) {
   const [estantes, setEstantes] = useState([])
   const [arestas, setArestas] = useState([])
@@ -435,9 +434,7 @@ function Rotas({
 
               <h2>Produto Atual</h2>
 
-              <p className="rotas-distancia">
-                Distância total: {distanciaTotal} unidades
-              </p>
+              
 
               {!atual && !concluida && (
                 <p>
